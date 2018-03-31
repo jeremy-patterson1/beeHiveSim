@@ -45,144 +45,128 @@ from bee_sim import beeSim
 #    N = 200
 #    x = np.linspace(0, 4*np.pi, N)
 #    y = 30000*np.sin(x) + 30000
-    
-    
-# Set up widgets
-peakEggRate = Select(title="Peak egg rate:", value="1500", 
-                     options=["1000", "1250", "1500", "1750", "2000"])
 
-startDate = Select(title="Start Conditions:", value="Feb 15", 
-                   options=["Feb 15", "Mar 1", "Mar 15", "Apr 1", "Apr 15", "May 1", 
+
+# Set up widgets
+peakEggRate_widget = Select(title="Peak egg rate:", value="1500",
+                            options=["1000", "1250", "1500", "1750", "2000"])
+
+startDate_widget = Select(title="Start Date:", value="Feb 15",
+                          options=["Feb 15", "Mar 1", "Mar 15", "Apr 1", "Apr 15", "May 1",
                             "May 15", "Jun 1", "Jun 15"])
-    
-startBees = Select(title="", value="1kg (6600 bees)", 
-                   options=["1kg (6600 bees)", 
-                            "3lb (9000 bees)", "2 Frames (6000 bees)", "3 Frames (9000 bees)", 
+endDate_widget = Select(title="End Date:", value="Dec 15",
+                        options=["Oct 15", "Nov 1", "Nov 15", "Dec 1", "Dec 15"])
+
+startBees_widget = Select(title="", value="1kg (6600 bees)",
+                          options=["1kg (6600 bees)",
+                            "3lb (9000 bees)", "2 Frames (6000 bees)", "3 Frames (9000 bees)",
                             "4 Frames (12000 bees)", "5 Frames (15000 bees)", "6 Frames (18000 bees)",
                             "7 Frames (21000 bees)", "8 Frames (24000 bees)", "9 Frames (27000 bees)"])
-    
-startCond = Select(title="Start Conditions:", value="Packaged", 
-                   options=["Packaged", "Wintered", "Nuc with Queen", "Nuc with Cell", 
+
+startCond_widget = Select(title="Start Conditions:", value="Packaged",
+                          options=["Packaged", "Wintered", "Nuc with Queen", "Nuc with Cell",
                             "Nuc make Queen"])
-    
-evictDrones = Select(title="Evict Drones:", value="Sept 15", 
-                     options=["Aug 1", "Aug 15", "Sept 1", "Sept 15", "Oct 1"])
 
-Manipulations = Select(title="", value="No Manipulations", 
-                   options=["No Manipulations", "Kill Queen", "Swarm", "Requeen (Caged)", 
-                            "Requeen (Cell)", "Cutdown (2 Frames)","Harvest 1 Brood", 
-                            "Harvest 2 Brood","Harvest Brood 4x7","Harvest Brood 8x7"])
+evictDrones_widget = Select(title="Evict Drones:", value="Sept 15",
+                            options=["Aug 1", "Aug 15", "Sep 1", "Sep 15", "Oct 1"])
 
-slowDown = Select(title="Slowdown:", value="Sept 1", 
-                     options=["July 1", "July 15", "Aug 1", "Aug 15", "Sept 1", 
-                              "Sept 15"])
+manipulations_widget = Select(title="", value="No Manipulations",
+                              options=["No Manipulations", "Kill Queen", "Swarm", "Requeen (Caged)",
+                                "Requeen (Cell)", "Cutdown (2 Frames)", "Harvest 1 Brood",
+                                "Harvest 2 Brood", "Harvest Brood 4x7", "Harvest Brood 8x7"])
 
-broodlessDate = Select(title="Broodless Date:", value="Nov 1", 
-                     options=["Oct 1", "Oct 15", "Nov 1", "Nov 15"])
+slowDown_widget = Select(title="Slowdown:", value="Sept 1",
+                         options=["Jul 1", "Jul 15", "Aug 1", "Aug 15", "Sept 1",
+                           "Sept 15"])
 
-treat_1 = Select(title="Treatment:", value="None", 
-                     options=["None", "Formic Flash", "OAV", "OAV 2x7", "OAV 3x7",
-                              "OAV 4x5"])
+broodlessDate_widget = Select(title="Broodless Date:", value="Nov 1",
+                              options=["Oct 1", "Oct 15", "Nov 1", "Nov 15"])
 
-treat_1_date = Select(title="", value="July 1", 
-                     options=["Apr 1", "Apr 15", "May 1", "May 15", "Jun 1", "Jun 15",
-                              "July 1", "July 15", "Aug 1", "Aug 15", "Sept 1", "Sept 15",
-                              "Oct 1", "Oct 15", "Nov 1"])
+treat_1_widget = Select(title="Treatment:", value="None",
+                        options=["None", "Formic Flash", "OAV", "OAV 2x7", "OAV 3x7",
+                          "OAV 4x5"])
 
-treat_2 = Select(title="Treatment:", value="None", 
-                     options=["None", "Formic Flash", "OAV", "OAV 2x7", "OAV 3x7",
-                              "OAV 4x5"])
+treat_1_date_widget = Select(title="", value="July 1",
+                             options=["Apr 1", "Apr 15", "May 1", "May 15", "Jun 1", "Jun 15",
+                               "Jul 1", "Jul 15", "Aug 1", "Aug 15", "Sep 1", "Sep 15",
+                               "Oct 1", "Oct 15", "Nov 1"])
 
-treat_2_date = Select(title="", value="July 1", 
-                     options=["Apr 1", "Apr 15", "May 1", "May 15", "Jun 1", "Jun 15",
-                              "July 1", "July 15", "Aug 1", "Aug 15", "Sept 1", "Sept 15",
-                              "Oct 1", "Oct 15", "Nov 1"])
+treat_2_widget = Select(title="Treatment:", value="None",
+                        options=["None", "Formic Flash", "OAV", "OAV 2x7", "OAV 3x7",
+                          "OAV 4x5"])
 
-startMites = Select(title="Start Mites:", value="0", 
-                     options=["0", "1", "5", "10", "50", "100", "500", "1000"])
+treat_2_date_widget = Select(title="", value="July 1",
+                             options=["Apr 1", "Apr 15", "May 1", "May 15", "Jun 1", "Jun 15",
+                               "Jul 1", "Jul 15", "Aug 1", "Aug 15", "Sep 1", "Sep 15",
+                               "Oct 1", "Oct 15", "Nov 1"])
 
-# Set up callbacks
-#def update_title(attrname, old, new):
-#    plot.title.text = text.value
-
-#text.on_change('value', update_title)
-
-# get some initial data
-#N = 200
-#x = np.linspace(0, 4*np.pi, N)
-#y = 30000*np.sin(x) + 30000
-#
-#source = ColumnDataSource(data=dict(x=x, y=y))
-
+startMites_widget = Select(title="Start Mites:", value="0",
+                           options=["0", "1", "5", "10", "50", "100", "500", "1000"])
 
 # get the initial data:
-peak_egg_rate = peakEggRate.value
-start_date = startDate.value
-start_bees = startBees.value
-start_cond = startCond.value
-evict_drones = evictDrones.value
-manipulations = Manipulations.value
-slowdown = slowDown.value
-broodless_date = broodlessDate.value
-treat1 = treat_1.value
-treat1date = treat_1_date.value
-treat2 = treat_2.value
-treat2date = treat_2_date.value
-start_mites = startMites.value
+peak_egg_rate = peakEggRate_widget.value
+start_date = startDate_widget.value
+end_date = endDate_widget.value
+start_bees = startBees_widget.value
+start_cond = startCond_widget.value
+evict_drones = evictDrones_widget.value
+manipulations = manipulations_widget.value
+slowdown = slowDown_widget.value
+broodless_date = broodlessDate_widget.value
+treat_1 = treat_1_widget.value
+treat_1_date = treat_1_date_widget.value
+treat_2 = treat_2_widget.value
+treat_2_date = treat_2_date_widget.value
+start_mites = startMites_widget.value
 
-inputData = dict(peak_egg_rate=peak_egg_rate,start_date=start_date,start_bees=start_bees,
-                 start_cond=start_cond,evict_drones=evict_drones,manipulations=manipulations,
-                 slowdown=slowdown,broodless_date=broodless_date,treat1=treat1,
-                 treat1date=treat1date,treat2=treat2,treat2date=treat2date,start_mites=start_mites)
+inputData = dict(peak_egg_rate=peak_egg_rate, start_date=start_date, end_date=end_date, start_bees=start_bees,
+                 start_cond=start_cond, evict_drones=evict_drones, manipulations=manipulations,
+                 slowdown=slowdown, broodless_date=broodless_date, treat1=treat_1,
+                 treat1date=treat_1_date, treat2=treat_2, treat2date=treat_2_date, start_mites=start_mites)
 
 source = ColumnDataSource(data=beeSim(inputData))
 
 # Set up plot
 plot = figure(plot_height=400, plot_width=800, title="Colony Progression Thru the Season",
               tools="crosshair,pan,reset,save,wheel_zoom",
-              x_range=[0, 4*np.pi], y_range=[0, 90000])
+              x_range=[0, 4 * np.pi], y_range=[0, 90000])
 
 plot.line('x', 'y', source=source, line_width=3, line_alpha=0.6)
 
 
 def update_data(attrname, old, new):
-    print('In update_data')
+    print('Updating Data')
     # get the data:
-    peak_egg_rate = peakEggRate.value
-    start_date = startDate.value
-    start_bees = startBees.value
-    start_cond = startCond.value
-    evict_drones = evictDrones.value
-    manipulations = Manipulations.value
-    slowdown = slowDown.value
-    broodless_date = broodlessDate.value
-    treat1 = treat_1.value
-    treat1date = treat_1_date.value
-    treat2 = treat_2.value
-    treat2date = treat_2_date.value
-    start_mites = startMites.value
-    
-    inputData = dict(peak_egg_rate=peak_egg_rate,start_date=start_date,start_bees=start_bees,
-                     start_cond=start_cond,evict_drones=evict_drones,manipulations=manipulations,
-                     slowdown=slowdown,broodless_date=broodless_date,treat1=treat1,
-                     treat1date=treat1date,treat2=treat2,treat2date=treat2date,start_mites=start_mites)
+    peak_egg_rate = peakEggRate_widget.value
+    start_date = startDate_widget.value
+    end_date = endDate_widget.value
+    start_bees = startBees_widget.value
+    start_cond = startCond_widget.value
+    evict_drones = evictDrones_widget.value
+    manipulations = manipulations_widget.value
+    slowdown = slowDown_widget.value
+    broodless_date = broodlessDate_widget.value
+    treat1 = treat_1_widget.value
+    treat1date = treat_1_date_widget.value
+    treat2 = treat_2_widget.value
+    treat2date = treat_2_date_widget.value
+    start_mites = startMites_widget.value
+
+    inputData = dict(peak_egg_rate=peak_egg_rate, start_date=start_date, end_date=end_date, start_bees=start_bees,
+                     start_cond=start_cond, evict_drones=evict_drones, manipulations=manipulations,
+                     slowdown=slowdown, broodless_date=broodless_date, treat1=treat1,
+                     treat1date=treat1date, treat2=treat2, treat2date=treat2date, start_mites=start_mites)
 
     # run the simulation again
-    source.data = beeSim(inputData) #dict(x=x, y=y) 
+    source.data = beeSim(inputData)
 
-for w in [peakEggRate, startDate, startBees, startCond, evictDrones,Manipulations,
-              slowDown,broodlessDate,treat_1,treat_1_date,treat_2,treat_2_date,startMites]:
-    w.on_change('value', update_data)
+for data in [peakEggRate_widget, startDate_widget, startBees_widget, startCond_widget, evictDrones_widget, manipulations_widget,
+             slowDown_widget, broodlessDate_widget, treat_1_widget, treat_1_date_widget, treat_2_widget, treat_2_date_widget, startMites_widget]:
+    data.on_change('value', update_data)
 
 # Set up layouts and add to document
-inputs = widgetbox(peakEggRate, startDate, startBees, startCond, evictDrones,Manipulations,
-              slowDown,broodlessDate,treat_1,treat_1_date,treat_2,treat_2_date,startMites)
+inputs = widgetbox(peakEggRate_widget, startDate_widget, startBees_widget, startCond_widget, evictDrones_widget, manipulations_widget,
+                   slowDown_widget, broodlessDate_widget, treat_1_widget, treat_1_date_widget, treat_2_widget, treat_2_date_widget, startMites_widget)
 
 curdoc().add_root(row(inputs, plot, width=1200))
 curdoc().title = "HiveModel"
-    
-
-
-
-
-
