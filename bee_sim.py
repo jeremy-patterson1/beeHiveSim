@@ -64,10 +64,10 @@ def beeSim(inputData):
 
     # how long workers live?
     springAge = 6 * 10  # days
-    springStartString = "Mar 20 " + str(currentTime.year)
+    springStartString = "Feb 20 " + str(currentTime.year)
     springStartDate = datetime.strptime(springStartString, '%b %d %Y')
     summerAge = 6 * 7  # days
-    summerStartString = "Jun 21 " + str(currentTime.year)
+    summerStartString = "Apr 21 " + str(currentTime.year)
     summerStartDate = datetime.strptime(summerStartString, '%b %d %Y')
     fallAge = 6 * 12  # days
     fallStartString = "Sep 22 " + str(currentTime.year)
@@ -99,8 +99,11 @@ def beeSim(inputData):
 
     numEggsLayed = np.zeros(numDays)
     output['numWorkers'] = np.zeros(numDays)
-    output['numDrones'] =  np.zeros(numDays)
+    output['numBrood'] = np.zeros(numDays)
+    output['numDrones'] = np.zeros(numDays)
+    output['numCombs'] = np.zeros(numDays)
     output['dates'] = np.array([startDate+timedelta(days=i) for i in xrange(numDays)])
+    broodArray = np.empty(0)
 
     if startCond == "Packaged":
         combsBuilt = 0
@@ -110,6 +113,8 @@ def beeSim(inputData):
         # get the outputs
         output['numWorkers'][index] = len(workerArray)
         output['numDrones'][index] = len(droneArray)
+        output['numBrood'][index] = len(broodArray)
+        output['numCombs'][index] = combsBuilt
 
         todaysDate = startDate + timedelta(days=index)
 
@@ -135,29 +140,43 @@ def beeSim(inputData):
             hiveBuilder = len(workerArray[(workerArray >= 12) & (workerArray <= 30)])
             hiveBuilder_sick = len(sickWorkerArray[(sickWorkerArray >= 12) & (sickWorkerArray <= 30)])
 
-            openComb = (hiveBuilder + hiveBuilder_sick/2)/combBuildSpeed
+            combsBuilt = math.ceil((hiveBuilder + hiveBuilder_sick/2)/combBuildSpeed + combsBuilt)
+            openComb = combsBuilt
 
-            combsBuilt = (hiveBuilder + hiveBuilder_sick/2)/combBuildSpeed + combsBuilt
-
-            numEggsLayed[index] = openComb
+            numEggsLayed[index] = np.minimum(openComb, peakEggRate)
             numHatched = 0
+
+
+
         elif startCond == "Packaged" and index < 6 * 7:
 
             hiveBuilder = len(workerArray[(workerArray >= 12) & (workerArray <= 20)])
             hiveBuilder_sick = len(sickWorkerArray[(sickWorkerArray >= 12) & (sickWorkerArray <= 20)])
 
             # X eggs hatch each day and bees build X comb
-            numHatched = numEggsLayed[index - 20]
-            openComb = (hiveBuilder + hiveBuilder_sick/2)/combBuildSpeed + numHatched
-            # how many will the queen lay today?
-            numEggsLayed[index] = np.minimum(openComb, peakEggRate)
-        elif startCond == "Packaged":
-            # X eggs hatch each day and bees build X comb
-            numHatched = numEggsLayed[index - 20]
-            openComb = (hiveBuilder + hiveBuilder_sick/2)/combBuildSpeed + numHatched
+            numHatched = len(broodArray[broodArray > 20])
+            broodArray = broodArray[broodArray <= 21]
+
+            combsBuilt = math.ceil((hiveBuilder + hiveBuilder_sick / 2) / combBuildSpeed + combsBuilt)
+
+            openComb = combsBuilt + numHatched
+
             # how many will the queen lay today?
             numEggsLayed[index] = np.minimum(openComb, peakEggRate)
 
+
+        elif startCond == "Packaged":
+
+            # X eggs hatch each day and bees build X comb
+            numHatched = len(broodArray[broodArray > 20])
+            broodArray = broodArray[broodArray <= 21]
+
+            combsBuilt = math.ceil((hiveBuilder + hiveBuilder_sick / 2) / combBuildSpeed + combsBuilt)
+
+            openComb = combsBuilt + numHatched
+
+            # how many will the queen lay today?
+            numEggsLayed[index] = np.minimum(openComb, peakEggRate)
 
 
         # Egg laying stops 20 days before broodless
@@ -169,6 +188,9 @@ def beeSim(inputData):
                 numEggsLayed[index] = 0
             else:
                 numEggsLayed[index] = math.ceil(peakEggRate * (1 - percent))
+
+        # how much brood is there now?
+        broodArray = np.append(broodArray, np.zeros(int(numEggsLayed[index])))
 
         # Bees dieing today
         # what season are we in?
@@ -187,14 +209,15 @@ def beeSim(inputData):
             workerArray = workerArray[workerArray <= summerAge]
             droneArray = droneArray[droneArray <= summerAge]
         elif todaysDate < winterStartDate:
-            # fall
+            # fall: send out the drones
             print "num old workers: ", len(workerArray[workerArray > fallAge])
             workerArray = workerArray[workerArray <= fallAge]
-            droneArray = droneArray[droneArray <= fallAge]
+            droneArray = []
         else:
             # winter (no drones)
             print "num old workers: ", len(workerArray[workerArray > winterAge])
             workerArray = workerArray[workerArray <= winterAge]
+            droneArray = []
 
         # sick bees:
         sickWorkerArray = sickWorkerArray[sickWorkerArray < sickAge]
@@ -209,14 +232,11 @@ def beeSim(inputData):
         droneArray = droneArray + 1
         sickWorkerArray = sickWorkerArray + 1
         sickDroneArray = sickDroneArray + 1
-
-
-        if index == 199:
-            print "hold on"
+        broodArray = broodArray + 1
 
         print "done with day: ", index
         print "worker average age:", np.average(workerArray)
-        print "num eggs layed: ", numEggsLayed[index]
+        print "num eggs laid: ", numEggsLayed[index]
         print "num workers", len(workerArray)
 
 
@@ -251,21 +271,27 @@ if __name__ == "__main__":
     outputData = beeSim(inputData)
 
     # plot the output Data:
-    fig, ax = plt.subplots()
-    line1, = ax.plot(outputData['x'], outputData['y'], '--', linewidth=2)
-    plt.show()
-    plt.grid()
+    # fig, ax = plt.subplots()
+    # line1, = ax.plot(outputData['x'], outputData['y'], '--', linewidth=2)
+    # plt.show()
+    # plt.grid()
 
 
     months = MonthLocator(range(1, 13), bymonthday=1, interval=3)
     monthsFmt = DateFormatter("%b")
     fig2, ax2 = plt.subplots()
-    line2, = ax2.plot_date(outputData['dates'], outputData['numWorkers'], '--', linewidth=2)
+    line2 = ax2.plot_date(outputData['dates'], outputData['numWorkers'], '--', linewidth=2, label='# Workers')
+    line3 = ax2.plot_date(outputData['dates'], outputData['numEggsLayed'], '--', linewidth=2, label='# Eggs Layed')
+    line4 = ax2.plot_date(outputData['dates'], outputData['numBrood'], '--', linewidth=2, label='# Brood')
+    line5 = ax2.plot_date(outputData['dates'], outputData['numCombs'], '--', linewidth=2, label='# Combs Built')
+
     ax2.xaxis.set_major_locator(months)
     ax2.xaxis.set_major_formatter(monthsFmt)
+    ax2.legend()
     ax2.autoscale_view()
 
-    plt.show()
     plt.grid()
+    plt.show()
+
 
 print "bee_sim done"
